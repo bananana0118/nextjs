@@ -1,15 +1,39 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import React ,{ useState } from "react";
+import ReactDOM from 'react-dom';
+import dynamic from 'next/dynamic';
+import 'froala-editor/css/froala_style.min.css';
+import 'froala-editor/css/froala_editor.pkgd.min.css';
 
 export default function List() {
   let products = ["Tomatoes", "Pasta", "Coconut"];
 
+  const config = {
+    toolbarButtons: ['bold', 'italic', 'underline', 'paragraphFormat', 'align','markdown'],
+      charCounterMax: 1000,
+    }
   let [count, setCount] = useState([0, 0, 0]);
-
+  const FroalaEditor = dynamic(
+    async () => {
+      const values = await Promise.all([
+        import("react-froala-wysiwyg"), // must be first import since we are doing values[0] in return
+        import("froala-editor/js/plugins.pkgd.min.js")
+      ]);
+      return values[0];
+    },
+    {
+      loading: () => <p>LOADING!!!</p>,
+      ssr: false
+    })
+    
+  if (typeof window !== "undefined") {
+    return <FroalaEditor tag="textarea" config={config}/>
+  }
   return (
     <div>
-      <h4 className="title">상품목록</h4>
+      <FroalaEditor  config={config}/>
+      <h4 className="title">상품목록!</h4>
       {products.map((product, i) => {
         return (
           <div key={i} className="food">
